@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+   <xacro:arg name="parts_dir" default="../" />
+
+   <xacro:include filename="$(arg parts_dir)/xacro_common.xacro"/>
+
+   <xacro:macro
+      name="typeg-lifter"
+      params="bottom_link top_link">
+
+      <xacro:armlink
+         model_type="typeg_lifter"
+         link_name="${bottom_link}"
+         mesh_name="lifter_base_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="ankle_joint_dummy"
+         type="continuous"
+         parent="${bottom_link}"
+         child="leg_shank_link_dummy"
+         joint_axis_xyz="0 -1 0"
+         joint_origin_xyz="0.01982 0 0.06182"
+         joint_origin_rpy="0 0 0"
+         mimic_parent="ankle_joint"
+         mimic_multiplier="1"
+         mimic_offset="0"
+         mimic="true" />
+
+      <xacro:armlink
+         model_type="typeg_lifter"
+         link_name="leg_shank_link_dummy"
+         mesh_name="leg_shank_link_dummy"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="ankle_joint"
+         type="revolute"
+         parent="${bottom_link}"
+         child="leg_shank_link"
+         joint_axis_xyz="0 -1 0"
+         joint_origin_xyz="-0.012 0 0.03"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="0"
+         joint_upper_limit="1.57"
+         joint_velocity_limit="0.5"
+         joint_effort_limit="200" />
+
+      <xacro:armlink
+         model_type="typeg_lifter"
+         link_name="leg_shank_link"
+         mesh_name="leg_shank_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="ankle_joint_mimic"
+         type="continuous"
+         parent="leg_shank_link"
+         child="leg_knee_link"
+         joint_axis_xyz="0 -1 0"
+         joint_origin_xyz="0 0 0.25"
+         joint_origin_rpy="0 0 0"
+         mimic_parent="ankle_joint"
+         mimic_multiplier="-1"
+         mimic_offset="0"
+         mimic="true" />
+
+      <xacro:armlink
+         model_type="typeg_lifter"
+         link_name="leg_knee_link"
+         mesh_name="leg_knee_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="knee_joint_dummy"
+         type="continuous"
+         parent="leg_knee_link"
+         child="leg_thigh_link_dummy"
+         joint_axis_xyz="0 1 0"
+         joint_origin_xyz="0.03182 0 0.08818"
+         joint_origin_rpy="0 0 0"
+         mimic_parent="knee_joint"
+         mimic_multiplier="-1"
+         mimic_offset="0"
+         mimic="true" />
+
+      <xacro:armlink
+         model_type="typeg_lifter"
+         link_name="leg_thigh_link_dummy"
+         mesh_name="leg_thigh_link_dummy"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="knee_joint"
+         type="revolute"
+         parent="leg_knee_link"
+         child="leg_thigh_link"
+         joint_axis_xyz="0 -1 0"
+         joint_origin_xyz="0 0 0.12"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="-1.57"
+         joint_upper_limit="0"
+         joint_velocity_limit="0.5"
+         joint_effort_limit="200" />
+
+      <xacro:armlink
+         model_type="typeg_lifter"
+         link_name="leg_thigh_link"
+         mesh_name="leg_thigh_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="knee_joint_mimic"
+         type="continuous"
+         parent="leg_thigh_link"
+         child="leg_base_link"
+         joint_axis_xyz="0 -1 0"
+         joint_origin_xyz="0 0 0.25"
+         joint_origin_rpy="0 0 0"
+         mimic_parent="knee_joint"
+         mimic_multiplier="-1"
+         mimic_offset="0"
+         mimic="true" />
+
+      <xacro:armlink
+         model_type="typeg_lifter"
+         link_name="leg_base_link"
+         mesh_name="leg_base_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="lifter_top_connector"
+         type="fixed"
+         parent="leg_base_link"
+         child="${top_link}"
+         joint_axis_xyz="0 0 1"
+         joint_origin_xyz="0.012 0 0.040"
+         joint_origin_rpy="0 0 0" />
+
+      <link name="${top_link}" />
+
+   </xacro:macro>
+</root>

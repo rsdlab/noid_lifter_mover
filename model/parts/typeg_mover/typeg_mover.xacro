@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+   <xacro:arg name="parts_dir" default="../" />
+
+   <xacro:include filename="$(arg parts_dir)/xacro_common.xacro"/>
+
+   <xacro:property
+      name="wheel_radius"
+      value="0.075" />
+
+   <xacro:macro
+      name="typeg-mover"
+      params="base_link top_link">
+
+      <link name="${base_link}" />
+
+      <xacro:armjoint
+         joint_name="base_link_to_wheel_base_link_connector"
+         type="fixed"
+         parent="${base_link}"
+         child="wheel_base_link"
+         joint_origin_xyz="0 0 ${wheel_radius}"
+         joint_origin_rpy="0 0 0" />
+
+      <xacro:armlink
+         model_type="typeg_mover"
+         link_name="wheel_base_link"
+         mesh_name="wheels_base"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="wheels_body_to_top_connector"
+         type="fixed"
+         parent="wheel_base_link"
+         child="${top_link}"
+         joint_origin_xyz="0.0 0.0 0.087"
+         joint_origin_rpy="0 0 0" />
+
+      <xacro:armlink
+         model_type="typeg_mover"
+         link_name="${top_link}"
+         mesh_name="wheels_top"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <!-- ホイール -->
+      <xacro:armjoint
+         joint_name="wheels_body_to_front_left_mecanum_connector"
+         type="fixed"
+         parent="wheel_base_link"
+         child="wheels_front_left_mecanum"
+         joint_axis_xyz="0 1 0"
+         joint_origin_xyz="0.241 0.194759 0"
+         joint_origin_rpy="0 0 0" />
+
+      <xacro:armlink
+         model_type="typeg_mover"
+         link_name="wheels_front_left_mecanum"
+         mesh_name="wheels_mecanum"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="${-pi/2} 0 0" />
+
+      <xacro:armjoint
+         joint_name="wheels_body_to_front_right_mecanum_connector"
+         type="fixed"
+         parent="wheel_base_link"
+         child="wheels_front_right_mecanum"
+         joint_axis_xyz="0 1 0"
+         joint_origin_xyz="0.241 -0.194759 0"
+         joint_origin_rpy="0 0 0" />
+
+      <xacro:armlink
+         model_type="typeg_mover"
+         link_name="wheels_front_right_mecanum"
+         mesh_name="wheels_mecanum"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="${-pi/2} 0 0" />
+
+      <xacro:armjoint
+         joint_name="wheels_body_to_rear_left_mecanum_connector"
+         type="fixed"
+         parent="wheel_base_link"
+         child="wheels_rear_left_mecanum"
+         joint_axis_xyz="0 1 0"
+         joint_origin_xyz="-0.241 0.194759 0"
+         joint_origin_rpy="0 0 0" />
+
+      <xacro:armlink
+         model_type="typeg_mover"
+         link_name="wheels_rear_left_mecanum"
+         mesh_name="wheels_mecanum"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="${-pi/2} 0 0" />
+
+      <xacro:armjoint
+         joint_name="wheels_body_to_rear_right_mecanum_connector"
+         type="fixed"
+         parent="wheel_base_link"
+         child="wheels_rear_right_mecanum"
+         joint_axis_xyz="0 1 0"
+         joint_origin_xyz="-0.241 -0.194759 0"
+         joint_origin_rpy="0 0 0" />
+
+      <xacro:armlink
+         model_type="typeg_mover"
+         link_name="wheels_rear_right_mecanum"
+         mesh_name="wheels_mecanum"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="${-pi/2} 0 0" />
+
+
+      <!-- LIDAR -->
+      <xacro:armjoint
+         joint_name="wheels_body_to_base_laser_connector"
+         type="fixed"
+         parent="wheel_base_link"
+         child="wheels_base_laser_link"
+         joint_origin_xyz="0.308 0 0.1014"
+         joint_origin_rpy="0 0 0" />
+
+      <xacro:armlink
+         model_type="typeg_mover"
+         link_name="wheels_base_laser_link"
+         mesh_name="wheels_urg"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <!-- カメラ -->
+      <xacro:armjoint
+         joint_name="wheel_base_link_to_front_camera_base_link"
+         type="fixed"
+         parent="wheel_base_link"
+         child="front_camera_base_link"
+         joint_origin_xyz="0.31815 0 0.0185"
+         joint_origin_rpy="0 0 0" />
+
+      <link name="front_camera_base_link" />
+
+      <xacro:armjoint
+         joint_name="front_camera_base_link_to_front_camera_link"
+         type="fixed"
+         parent="front_camera_base_link"
+         child="front_camera_link"
+         joint_origin_xyz="0 0.0175 0.0125"
+         joint_origin_rpy="0 0 0" />
+      <link name="front_camera_link" />
+
+      <xacro:armjoint
+         joint_name="front_camera_link_to_front_camera_right_ir_link"
+         type="fixed"
+         parent="front_camera_link"
+         child="front_camera_right_ir_frame"
+         joint_origin_xyz="0 -0.05 0"
+         joint_origin_rpy="0 0 0" />
+      <link name="front_camera_right_ir_frame" />
+
+      <xacro:armjoint
+         joint_name="wheel_base_link_to_rear_camera_base_link"
+         type="fixed"
+         parent="wheel_base_link"
+         child="rear_camera_base_link"
+         joint_origin_xyz="-0.31815 0 0.0185"
+         joint_origin_rpy="0 0 ${pi}" />
+      <link name="rear_camera_base_link" />
+
+      <xacro:armjoint
+         joint_name="rear_camera_base_link_to_rear_camera_link"
+         type="fixed"
+         parent="rear_camera_base_link"
+         child="rear_camera_link"
+         joint_origin_xyz="0 0.0175 0.0125"
+         joint_origin_rpy="0 0 0" />
+      <link name="rear_camera_link" />
+
+      <xacro:armjoint
+         joint_name="rear_camera_link_to_rear_camera_right_ir_link"
+         type="fixed"
+         parent="rear_camera_link"
+         child="rear_camera_right_ir_frame"
+         joint_origin_xyz="0 -0.05 0"
+         joint_origin_rpy="0 0 0" />
+      <link name="rear_camera_right_ir_frame" />
+
+   </xacro:macro>
+</root>

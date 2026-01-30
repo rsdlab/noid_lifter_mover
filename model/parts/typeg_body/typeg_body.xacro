@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:arg name="parts_dir" default="../" />
+
+    <xacro:include filename="$(arg parts_dir)/xacro_common.xacro" />
+
+    <xacro:macro name="typeg-body" params="base_link">
+
+      <xacro:armlink
+         model_type="typeg_body"
+         link_name="${base_link}"
+         mesh_name="waist_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+      
+      <xacro:armjoint
+         joint_name="waist_y_joint"
+         type="revolute"
+         parent="${base_link}"
+         child="hip_sphere_link"
+         joint_axis_xyz="0 0 1"
+         joint_origin_xyz="0 0 0.005"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="-2.09"
+         joint_upper_limit="2.09"
+         joint_velocity_limit="0.6"
+         joint_effort_limit="10" />
+      
+
+      <xacro:armlink
+         model_type="typeg_body"
+         link_name="hip_sphere_link"
+         mesh_name="hip_sphere_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="waist_p_joint"
+         type="revolute"
+         parent="hip_sphere_link"
+         child="hip_center"
+         joint_axis_xyz="0 1 0"
+         joint_origin_xyz="0 0 0.132"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="0.0"
+         joint_upper_limit="0.43"
+         joint_velocity_limit="0.4"
+         joint_effort_limit="10" />
+
+      <link name="hip_center">
+      </link>
+
+      <xacro:armjoint
+         joint_name="waist_r_joint"
+         type="revolute"
+         parent="hip_center"
+         child="body_link"
+         joint_axis_xyz="1 0 0"
+         joint_origin_xyz="0 0 0"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="-0.08"
+         joint_upper_limit="0.08"
+         joint_velocity_limit="0.3"
+         joint_effort_limit="10" />
+
+      <xacro:armlink
+         model_type="typeg_body"
+         link_name="body_link"
+         mesh_name="body_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="neck_y_joint"
+         type="revolute"
+         parent="body_link"
+         child="neck_link"
+         joint_axis_xyz="0 0 1"
+         joint_origin_xyz="0.002 0 0.377"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="-2.09"
+         joint_upper_limit="2.09"
+         joint_velocity_limit="1.7"
+         joint_effort_limit="10" />
+
+      <xacro:armlink
+         model_type="typeg_body"
+         link_name="neck_link"
+         mesh_name="neck_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="neck_p_joint"
+         type="revolute"
+         parent="neck_link"
+         child="head_base_link"
+         joint_axis_xyz="0 1 0"
+         joint_origin_xyz="0.0 0 0.0265"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="-0.34"
+         joint_upper_limit="0.52"
+         joint_velocity_limit="2.1"
+         joint_effort_limit="10" />
+
+      <xacro:armlink
+         model_type="typeg_body"
+         link_name="head_base_link"
+         mesh_name="head_base_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+
+      <xacro:armjoint
+         joint_name="neck_r_joint"
+         type="revolute"
+         parent="head_base_link"
+         child="head_link"
+         joint_axis_xyz="1 0 0"
+         joint_origin_xyz="0 0 0"
+         joint_origin_rpy="0 0 0"
+         joint_lower_limit="-0.34"
+         joint_upper_limit="0.34"
+         joint_velocity_limit="0.8"
+         joint_effort_limit="10" />
+
+      <xacro:armlink
+         model_type="typeg_body"
+         link_name="head_link"
+         mesh_name="head_link"
+         base_origin_xyz="0 0 0"
+         base_origin_rpy="0 0 0" />
+         
+        <link name="chest_camera_link" />
+
+        <joint name="body_link_to_chest_camera_link" type="fixed">
+            <parent link="body_link" />
+            <child link="chest_camera_link" />
+            <origin xyz="0.058198 0.0 0.273087" rpy="0 0.698132 0" />
+        </joint>
+
+        <link name="chest_camera_right_ir_frame" />
+
+        <joint name="chest_camera_link_to_chest_camera_right_ir_link" type="fixed">
+            <parent link="chest_camera_link" />
+            <child link="chest_camera_right_ir_frame" />
+            <origin xyz="0 -0.055 0" rpy="0 0 0" />  <!-- realsense d415 -->
+        </joint>
+
+    </xacro:macro>
+</root>

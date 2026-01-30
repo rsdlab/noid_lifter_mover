@@ -1,0 +1,8 @@
+front_laser_filter:
+  ros__parameters:
+    filter1:
+      name: shadows
+      type: custom_laser_filters/EdgeEffectFilter
+      params:
+        min_angle: 5.0 #[deg]
+        neighbors: 3

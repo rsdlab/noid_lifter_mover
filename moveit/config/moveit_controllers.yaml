@@ -1,0 +1,64 @@
+# MoveIt uses this configuration for controller management
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+trajectory_execution:
+  allowed_execution_duration_scaling: 1.2
+  allowed_goal_duration_margin: 0.5
+  allowed_start_tolerance: 0.02
+  execution_duration_monitoring: false # May lead to unexpectedly aborted goals with scaled JTC
+
+moveit_simple_controller_manager:
+  controller_names:
+    - rarm_controller
+    - larm_controller
+    - waist_controller
+    - lifter_controller
+    - head_controller
+
+  rarm_controller:
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - r_shoulder_p_joint
+      - r_shoulder_r_joint
+      - r_shoulder_y_joint
+      - r_elbow_joint
+      - r_wrist_y_joint
+      - r_wrist_p_joint
+      - r_wrist_r_joint
+
+  larm_controller:
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - l_shoulder_p_joint
+      - l_shoulder_r_joint
+      - l_shoulder_y_joint
+      - l_elbow_joint
+      - l_wrist_y_joint
+      - l_wrist_p_joint
+      - l_wrist_r_joint
+
+  waist_controller:
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - waist_y_joint
+      - waist_p_joint
+      - waist_r_joint
+
+  lifter_controller:
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - ankle_joint
+      - knee_joint
+
+  head_controller:
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - neck_y_joint
+      - neck_p_joint
+      - neck_r_joint

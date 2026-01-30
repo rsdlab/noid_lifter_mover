@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:arg name="parts_dir" default="../" />
+
+    <xacro:include filename="$(arg parts_dir)/xacro_common.xacro" />
+
+    <xacro:macro
+        name="trx_s"
+        params="type:=right prefix:=1 base_link:=hand_link">
+
+        <xacro:if value="${type=='right'}">
+            <xacro:property
+                name="reflect"
+                value="1" />
+        </xacro:if>
+        <xacro:unless value="${type=='right'}">
+            <xacro:property
+                name="reflect"
+                value="-1" />
+        </xacro:unless>
+
+        <xacro:armlink
+            model_type="trx_s"
+            link_name="${base_link}"
+            mesh_name="RARM_LINK7_mesh"
+            base_origin_xyz="0 0 0"
+            base_origin_rpy="0 0 ${(1.0 - reflect) * pi / 2.0}" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_indexbase_joint"
+            type="continuous"
+            parent="${prefix}_hand_link"
+            child="${prefix}_indexbase_link"
+            joint_axis_xyz="1 0 0"
+            joint_origin_xyz="0 ${-0.013 * reflect} -0.115"
+            joint_origin_rpy="0 0 0"
+            mimic_parent="${prefix}_thumb_joint"
+            mimic_multiplier="-1"
+            mimic_offset="0"
+            mimic="true" />
+
+        <xacro:armlink
+            model_type="trx_s"
+            link_name="${prefix}_indexbase_link"
+            mesh_name="RARM_INDEX_LINK1_mesh"
+            base_origin_xyz="0 ${0.013 * reflect} 0.115"
+            base_origin_rpy="0 0 ${(1.0 - reflect) * pi / 2.0}" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_indexmid_joint"
+            type="fixed"
+            parent="${prefix}_indexbase_link"
+            child="${prefix}_indexmid_link"
+            joint_origin_xyz="0 ${0.028754 * reflect} -0.034615"
+            joint_origin_rpy="0 0 0" />
+
+        <xacro:armlink
+            model_type="trx_s"
+            link_name="${prefix}_indexmid_link"
+            mesh_name="RARM_INDEX_LINK2_mesh"
+            base_origin_xyz="0 ${-0.015754 * reflect} 0.149615"
+            base_origin_rpy="0 0 ${(1.0 - reflect) * pi / 2.0}" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_indexend_joint"
+            type="fixed"
+            parent="${prefix}_indexmid_link"
+            child="${prefix}_indexend_link"
+            joint_origin_xyz="0 ${0.021716 * reflect} -0.013357"
+            joint_origin_rpy="0 0 0" />
+
+        <xacro:armlink
+            model_type="trx_s"
+            link_name="${prefix}_indexend_link"
+            mesh_name="RARM_INDEX_LINK3_mesh"
+            base_origin_xyz="0 ${-0.03747 * reflect} 0.162972"
+            base_origin_rpy="0 0 ${(1.0 - reflect) * pi / 2.0}" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_thumb_joint"
+            type="revolute"
+            parent="${prefix}_hand_link"
+            child="${prefix}_thumb_link"
+            joint_axis_xyz="1 0 0"
+            joint_origin_xyz="0 ${0.022355 * reflect} -0.079645"
+            joint_origin_rpy="0 0 0"
+            joint_lower_limit="${-0.905 - 0.035 * reflect }"
+            joint_upper_limit="${0.905 - 0.035 * reflect }"
+            joint_velocity_limit="0.5"
+            joint_effort_limit="50" />
+
+        <xacro:armlink
+            model_type="trx_s"
+            link_name="${prefix}_thumb_link"
+            mesh_name="RARM_THUMB_LINK_mesh"
+            base_origin_xyz="0 ${-0.022355 * reflect} 0.079645"
+            base_origin_rpy="0 0 ${(1.0 - reflect) * pi / 2.0}" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_eef_grasp_joint"
+            type="fixed"
+            parent="${prefix}_hand_link"
+            child="${prefix}_eef_grasp_link"
+            joint_origin_xyz="0.0 ${0.04 * reflect} -0.14"
+            joint_origin_rpy="0 ${pi/2} 0" />
+
+        <link name="${prefix}_eef_grasp_link" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_eef_pick_joint"
+            type="fixed"
+            parent="${prefix}_hand_link"
+            child="${prefix}_eef_pick_link"
+            joint_origin_xyz="0.0 ${0.07 * reflect} -0.16"
+            joint_origin_rpy="0 ${pi/2} 0" />
+
+        <link name="${prefix}_eef_pick_link" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_thumb_tip_joint"
+            type="fixed"
+            parent="${prefix}_thumb_link"
+            child="${prefix}_thumb_tip_link"
+            joint_origin_xyz="0.0 ${0.035 * reflect} -0.085"
+            joint_origin_rpy="0 0 0" />
+
+        <link name="${prefix}_thumb_tip_link" />
+
+        <xacro:armjoint
+            joint_name="${prefix}_index_tip_joint"
+            type="fixed"
+            parent="${prefix}_indexend_link"
+            child="${prefix}_index_tip_link"
+            joint_origin_xyz="0.0 ${0.02 * reflect} 0.0"
+            joint_origin_rpy="0 0 0" />
+
+        <link name="${prefix}_index_tip_link" />
+
+    </xacro:macro>
+</root>

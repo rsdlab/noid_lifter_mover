@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="noid_lifter_mover_ros2_control" params="name driver_settings">
+
+    <ros2_control name="${name}" type="system">
+      <hardware>
+        <plugin>seed_ros2_controller/RobotHardware</plugin>
+        <param name="driver_settings">${driver_settings}</param>
+      </hardware>
+    </ros2_control>
+
+  </xacro:macro>
+
+</robot>

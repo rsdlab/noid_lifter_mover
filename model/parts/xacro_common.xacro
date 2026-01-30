@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:arg name="parts_dir" default="./" />
+    <xacro:arg name="mesh_visual" default="mesh" />
+    <xacro:arg name="mesh_collision" default="mesh" />
+
+    <xacro:macro name="armlink" params="link_name model_type mesh_name base_origin_xyz base_origin_rpy">
+        <link name="${link_name}">
+            <visual>
+                <origin xyz="${base_origin_xyz}" rpy="${base_origin_rpy}" />
+                <geometry>
+                    <mesh filename="file://$(arg parts_dir)/${model_type}/$(arg mesh_visual)/${mesh_name}.dae" />
+                </geometry>
+            </visual>
+
+            <collision>
+                <origin xyz="${base_origin_xyz}" rpy="${base_origin_rpy}" />
+                <geometry>
+                    <mesh filename="file://$(arg parts_dir)/${model_type}/$(arg mesh_collision)/${mesh_name}.dae" />
+                </geometry>
+            </collision>
+        </link>
+
+    </xacro:macro>
+
+    <xacro:macro name="armjoint" params="joint_name type parent child joint_axis_xyz:='0 0 0' joint_origin_xyz joint_origin_rpy joint_lower_limit:=0 joint_upper_limit:=0 joint_velocity_limit:=0 joint_effort_limit:=0 mimic_parent:=dummy mimic_multiplier:=0 mimic_offset:=1 mimic:=false">
+        <joint name="${joint_name}" type="${type}">
+            <axis xyz="${joint_axis_xyz}" />
+            <parent link="${parent}" />
+            <child link="${child}" />
+
+            <origin xyz="${joint_origin_xyz}" rpy="${joint_origin_rpy}" />
+            <xacro:unless value="${type=='fixed' or mimic}">
+                <limit effort="${joint_effort_limit}" velocity="${joint_velocity_limit}" lower="${joint_lower_limit}" upper="${joint_upper_limit}" />
+            </xacro:unless>
+            <xacro:if value="${mimic}">
+                <mimic joint="${mimic_parent}" multiplier="${mimic_multiplier}" offset="${mimic_offset}" />
+            </xacro:if>
+        </joint>
+
+    </xacro:macro>
+
+</root>

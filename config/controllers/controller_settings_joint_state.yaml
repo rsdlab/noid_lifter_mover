@@ -1,0 +1,12 @@
+joint_state_broadcaster:
+   ros__parameters:   
+      type: joint_state_broadcaster/JointStateBroadcaster
+       
+      interfaces:
+         - position
+
+      joint_not_publish:
+         - wheel_front_left
+         - wheel_front_right
+         - wheel_rear_left
+         - wheel_rear_right

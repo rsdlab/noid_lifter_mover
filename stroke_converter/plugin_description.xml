@@ -1,0 +1,5 @@
+<library path="noid_lifter_mover_stroke_converter">
+  <class name="seed_converter/NoidLifterMover"  type="seed_converter::NoidLifterMover" base_class_type="seed_converter::StrokeConverter">
+    <description>NoidLifterMover stroke converter plugin.</description>
+  </class>
+</library>
