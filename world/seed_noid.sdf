@@ -1,0 +1,433 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="seed_noid">
+
+    <!-- Default camera: view robot from front-side at 4m distance, 1.5m height -->
+    <gui fullscreen="false">
+      <camera name="user_camera">
+        <pose>4 -3 1.5 0 0.2 2.3</pose>
+      </camera>
+    </gui>
+
+    <plugin filename="gz-sim-physics-system"
+            name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system"
+            name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <gravity>0 0 -9.8</gravity>
+    <atmosphere type="adiabatic"/>
+
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.0 0.0 0.0 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Table: 75x75x72cm, black legs, wood top, placed 0.8m in front of robot -->
+    <model name="table">
+      <static>true</static>
+      <pose>-2.63 1.54 0 0 0 0</pose>
+
+      <!-- Tabletop: 75x75x3cm, wood color, top surface at z=0.72m -->
+      <link name="tabletop">
+        <pose>0 0 0.705 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.75 0.75 0.03</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.75 0.75 0.03</size></box></geometry>
+          <material>
+            <ambient>0.55 0.35 0.15 1</ambient>
+            <diffuse>0.55 0.35 0.15 1</diffuse>
+            <specular>0.05 0.03 0.01 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Leg front-left -->
+      <link name="leg_fl">
+        <pose>0.355 0.355 0.345 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+          <material>
+            <ambient>0.05 0.05 0.05 1</ambient>
+            <diffuse>0.05 0.05 0.05 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Leg front-right -->
+      <link name="leg_fr">
+        <pose>0.355 -0.355 0.345 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+          <material>
+            <ambient>0.05 0.05 0.05 1</ambient>
+            <diffuse>0.05 0.05 0.05 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Leg back-left -->
+      <link name="leg_bl">
+        <pose>-0.355 0.355 0.345 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+          <material>
+            <ambient>0.05 0.05 0.05 1</ambient>
+            <diffuse>0.05 0.05 0.05 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Leg back-right -->
+      <link name="leg_br">
+        <pose>-0.355 -0.355 0.345 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.04 0.04 0.69</size></box></geometry>
+          <material>
+            <ambient>0.05 0.05 0.05 1</ambient>
+            <diffuse>0.05 0.05 0.05 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+
+    </model>
+
+    <!-- Stand: 45x90x100cm, all wood -->
+    <!-- -X faces robot (front); body panels 5cm inset from top; +X face (back) is open -->
+    <model name="stand">
+      <static>true</static>
+      <pose>0.60 -0.20 0 0 0 0</pose>
+
+      <!-- Top panel (天板): full 45x90cm, overhangs 5cm beyond body on all sides -->
+      <link name="tabletop">
+        <pose>0 0 0.99 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.45 0.90 0.02</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.45 0.90 0.02</size></box></geometry>
+          <material>
+            <ambient>0.55 0.35 0.15 1</ambient>
+            <diffuse>0.55 0.35 0.15 1</diffuse>
+            <specular>0.05 0.03 0.01 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Left side panel (Y+ face): flush with top edge (Y=0.45), no inset -->
+      <!-- Depth 35cm: 45cm top minus 5cm front inset minus 5cm back inset -->
+      <link name="left_panel">
+        <pose>0 0.44 0.49 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.35 0.02 0.98</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.35 0.02 0.98</size></box></geometry>
+          <material>
+            <ambient>0.55 0.35 0.15 1</ambient>
+            <diffuse>0.55 0.35 0.15 1</diffuse>
+            <specular>0.05 0.03 0.01 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Right side panel (Y- face): mirror of left -->
+      <link name="right_panel">
+        <pose>0 -0.44 0.49 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.35 0.02 0.98</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.35 0.02 0.98</size></box></geometry>
+          <material>
+            <ambient>0.55 0.35 0.15 1</ambient>
+            <diffuse>0.55 0.35 0.15 1</diffuse>
+            <specular>0.05 0.03 0.01 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Front panel (X- face, toward robot): 5cm inset from front top edge (X=-0.175) -->
+      <!-- Width 86cm: between inner faces of left/right panels (±0.43m) -->
+      <link name="front_panel">
+        <pose>-0.165 0 0.49 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.02 0.86 0.98</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.02 0.86 0.98</size></box></geometry>
+          <material>
+            <ambient>0.55 0.35 0.15 1</ambient>
+            <diffuse>0.55 0.35 0.15 1</diffuse>
+            <specular>0.05 0.03 0.01 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Back face (X+ direction) intentionally absent -->
+
+    </model>
+
+    <!-- Map display: rsdlab.pgm (cropped to room area rows 830-1170) -->
+    <!-- resolution=0.010m/px, cropped size=6.02x3.41m, origin=(-3.615,-1.243) -->
+    <!-- お盆: 外形 25.5(x) x 38.5(y) x 5.5(高さ)cm、底板0.5cm + 縁(深さ5cm, 厚さ1cm)。
+         短辺(25.5cm側)の縁の中央に 9cm x 2cm の持ち手穴。色はえんじ(台の茶色と区別)。
+         台の天板上面(z=1.00)に着座、ロボット側の縁ぴったり、ロボット正面(y=0) -->
+    <model name="tray">
+      <pose>0.5025 0 1.0 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>0 0 0.02 0 0 0</pose>
+          <mass>1.5</mass>
+          <inertia>
+            <ixx>0.0189</ixx> <ixy>0</ixy> <ixz>0</ixz>
+            <iyy>0.0085</iyy> <iyz>0</iyz>
+            <izz>0.0266</izz>
+          </inertia>
+        </inertial>
+        <collision name="bottom_col">
+          <pose>0 0 0.0025 0 0 0</pose>
+          <geometry><box><size>0.255 0.385 0.005</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="bottom_vis">
+          <pose>0 0 0.0025 0 0 0</pose>
+          <geometry><box><size>0.255 0.385 0.005</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_front_col">
+          <pose>0.1225 0 0.03 0 0 0</pose>
+          <geometry><box><size>0.01 0.385 0.05</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_front_vis">
+          <pose>0.1225 0 0.03 0 0 0</pose>
+          <geometry><box><size>0.01 0.385 0.05</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_rear_col">
+          <pose>-0.1225 0 0.03 0 0 0</pose>
+          <geometry><box><size>0.01 0.385 0.05</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_rear_vis">
+          <pose>-0.1225 0 0.03 0 0 0</pose>
+          <geometry><box><size>0.01 0.385 0.05</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_left_end1_col">
+          <pose>-0.08125 0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_left_end1_vis">
+          <pose>-0.08125 0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_left_end2_col">
+          <pose>0.08125 0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_left_end2_vis">
+          <pose>0.08125 0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_left_below_col">
+          <pose>0 0.1875 0.0125 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_left_below_vis">
+          <pose>0 0.1875 0.0125 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_left_above_col">
+          <pose>0 0.1875 0.0475 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_left_above_vis">
+          <pose>0 0.1875 0.0475 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_right_end1_col">
+          <pose>-0.08125 -0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_right_end1_vis">
+          <pose>-0.08125 -0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_right_end2_col">
+          <pose>0.08125 -0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_right_end2_vis">
+          <pose>0.08125 -0.1875 0.03 0 0 0</pose>
+          <geometry><box><size>0.0725 0.01 0.05</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_right_below_col">
+          <pose>0 -0.1875 0.0125 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_right_below_vis">
+          <pose>0 -0.1875 0.0125 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+        <collision name="rim_right_above_col">
+          <pose>0 -0.1875 0.0475 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <surface><friction><ode><mu>1.5</mu><mu2>1.5</mu2></ode></friction></surface>
+        </collision>
+        <visual name="rim_right_above_vis">
+          <pose>0 -0.1875 0.0475 0 0 0</pose>
+          <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
+          <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 部屋の外周壁: rsdlab.yaml の地図範囲 x:[-3.615,2.405] y:[-1.243,2.167] に一致させる。
+         壁が無いとLiDARが地図と照合できずAMCLの自己位置が大きくずれる -->
+    <model name="room_walls">
+      <static>true</static>
+      <link name="link">
+        <collision name="wall_north_col">
+          <pose>-0.605 2.217 0.5 0 0 0</pose>
+          <geometry><box><size>6.22 0.1 1.0</size></box></geometry>
+        </collision>
+        <visual name="wall_north_vis">
+          <pose>-0.605 2.217 0.5 0 0 0</pose>
+          <geometry><box><size>6.22 0.1 1.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+        <collision name="wall_south_col">
+          <pose>-0.605 -1.293 0.5 0 0 0</pose>
+          <geometry><box><size>6.22 0.1 1.0</size></box></geometry>
+        </collision>
+        <visual name="wall_south_vis">
+          <pose>-0.605 -1.293 0.5 0 0 0</pose>
+          <geometry><box><size>6.22 0.1 1.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+        <collision name="wall_west_col">
+          <pose>-3.665 0.462 0.5 0 0 0</pose>
+          <geometry><box><size>0.1 3.41 1.0</size></box></geometry>
+        </collision>
+        <visual name="wall_west_vis">
+          <pose>-3.665 0.462 0.5 0 0 0</pose>
+          <geometry><box><size>0.1 3.41 1.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+        <collision name="wall_east_col">
+          <pose>2.455 0.462 0.5 0 0 0</pose>
+          <geometry><box><size>0.1 3.41 1.0</size></box></geometry>
+        </collision>
+        <visual name="wall_east_vis">
+          <pose>2.455 0.462 0.5 0 0 0</pose>
+          <geometry><box><size>0.1 3.41 1.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="floor_map">
+      <static>true</static>
+      <pose>-0.605 0.462 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>6.02 3.41</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0 0 0 1</specular>
+            <pbr>
+              <metal>
+                <albedo_map>file:///home/rsdlab/seed_ROS2_ws/src/seed_robot_ros2_pkg/robots/noid_lifter_mover/world/rsdlab_map.png</albedo_map>
+                <metalness>0.0</metalness>
+                <roughness>1.0</roughness>
+              </metal>
+            </pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

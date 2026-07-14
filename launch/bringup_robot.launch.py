@@ -72,7 +72,7 @@ def generate_launch_description():
     ld.add_action(change_slam_mode_arg)    
     ld.add_action(display_rviz2_arg)    
 
-    read_map_yaml_file = PathJoinSubstitution([robot_pkg_path, 'config', 'navigation', 'map', 'scan_map.yaml'])
+    read_map_yaml_file = PathJoinSubstitution([robot_pkg_path, 'config', 'navigation', 'map', 'rsdlab.yaml'])
     bringup_nav_monitor_node = Node(
         package=pkg_name,
         executable='bringup_navigation_monitor_node',

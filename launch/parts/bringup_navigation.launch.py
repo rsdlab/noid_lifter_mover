@@ -108,7 +108,7 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=PathJoinSubstitution([robot_pkg, 'config', 'navigation', 'map', 'scan_map.yaml']),
+        default_value=PathJoinSubstitution([robot_pkg, 'config', 'navigation', 'map', 'rsdlab.yaml']),
         description='Full path to map yaml file to load'
     )
 
@@ -166,9 +166,27 @@ def generate_launch_description():
     )
 
     declare_log_level_cmd = DeclareLaunchArgument(
-        'log_level', 
-        default_value='info', 
+        'log_level',
+        default_value='info',
         description='log level'
+    )
+
+    declare_set_initial_pose_cmd = DeclareLaunchArgument(
+        'set_initial_pose',
+        default_value='False',
+        description='Have AMCL set its initial pose from parameters at activation (used by simulation)',
+    )
+
+    declare_bond_timeout_cmd = DeclareLaunchArgument(
+        'bond_timeout',
+        default_value='4.0',
+        description='Lifecycle manager bond heartbeat timeout in seconds (0.0 disables; recommended for simulation)',
+    )
+
+    declare_publish_static_map_odom_tf_cmd = DeclareLaunchArgument(
+        'publish_static_map_odom_tf',
+        default_value='True',
+        description='Publish a static map->odom TF in navigation.launch.py. Set False when AMCL broadcasts map->odom (e.g. Gazebo simulation)',
     )
 
     # Specify the actions
@@ -199,6 +217,8 @@ def generate_launch_description():
                     'use_composition': use_composition,
                     'use_respawn': use_respawn,
                     'container_name': 'nav2_container',
+                    'bond_timeout': LaunchConfiguration('bond_timeout'),
+                    'set_initial_pose': LaunchConfiguration('set_initial_pose'),
                 }.items(),
             ),
             IncludeLaunchDescription(
@@ -214,6 +234,8 @@ def generate_launch_description():
                     'use_respawn': use_respawn,
                     'slam_mode': slam,
                     'container_name': 'nav2_container',
+                    'publish_static_map_odom_tf': LaunchConfiguration('publish_static_map_odom_tf'),
+                    'bond_timeout': LaunchConfiguration('bond_timeout'),
                 }.items(),
             ),
         ]
@@ -239,6 +261,9 @@ def generate_launch_description():
     ld.add_action(declare_use_composition_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
+    ld.add_action(declare_set_initial_pose_cmd)
+    ld.add_action(declare_bond_timeout_cmd)
+    ld.add_action(declare_publish_static_map_odom_tf_cmd)
     ld.add_action(declare_use_localization_cmd)
 
     # Add the actions to launch all of the navigation nodes

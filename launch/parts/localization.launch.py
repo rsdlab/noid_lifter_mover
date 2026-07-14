@@ -59,7 +59,7 @@ def generate_launch_description():
         RewrittenYaml(
             source_file=params_file,
             root_key=namespace,
-            param_rewrites={},
+            param_rewrites={'use_sim_time': use_sim_time, 'set_initial_pose': LaunchConfiguration('set_initial_pose')},
             convert_types=True,
         ),
         allow_substs=True,
@@ -93,6 +93,18 @@ def generate_launch_description():
         'autostart',
         default_value='true',
         description='Automatically startup the nav2 stack',
+    )
+
+    declare_set_initial_pose_cmd = DeclareLaunchArgument(
+        'set_initial_pose',
+        default_value='False',
+        description='Have AMCL set its initial pose from the initial_pose parameters at activation (used by simulation)',
+    )
+
+    declare_bond_timeout_cmd = DeclareLaunchArgument(
+        'bond_timeout',
+        default_value='4.0',
+        description='Lifecycle manager bond heartbeat timeout in seconds (0.0 disables; recommended for simulation)',
     )
 
     declare_use_composition_cmd = DeclareLaunchArgument(
@@ -166,7 +178,7 @@ def generate_launch_description():
                 name='lifecycle_manager_localization',
                 output='screen',
                 arguments=['--ros-args', '--log-level', log_level],
-                parameters=[{'autostart': autostart}, {'node_names': lifecycle_nodes}],
+                parameters=[{'autostart': autostart}, {'node_names': lifecycle_nodes}, {'bond_timeout': LaunchConfiguration('bond_timeout')}],
             ),
         ],
     )
@@ -227,7 +239,7 @@ def generate_launch_description():
                         plugin='nav2_lifecycle_manager::LifecycleManager',
                         name='lifecycle_manager_localization',
                         parameters=[
-                            {'autostart': autostart, 'node_names': lifecycle_nodes}
+                            {'autostart': autostart, 'node_names': lifecycle_nodes, 'bond_timeout': LaunchConfiguration('bond_timeout')}
                         ],
                     ),
                 ],
@@ -247,6 +259,8 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_autostart_cmd)
+    ld.add_action(declare_set_initial_pose_cmd)
+    ld.add_action(declare_bond_timeout_cmd)
     ld.add_action(declare_use_composition_cmd)
     ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_use_respawn_cmd)

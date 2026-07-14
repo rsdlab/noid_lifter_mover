@@ -1,0 +1,96 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Enabled: true
+      Name: Grid
+    - Class: rviz_default_plugins/TF
+      Enabled: false
+      Name: TF
+    - Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Value: /robot_description
+      Enabled: true
+      Name: RobotModel
+    - Class: rviz_default_plugins/Map
+      Enabled: true
+      Name: Map
+      Topic:
+        Durability Policy: Transient Local
+        Value: /map
+      Update Topic:
+        Durability Policy: Transient Local
+        Value: /map_updates
+    - Class: rviz_default_plugins/Map
+      Color Scheme: costmap
+      Enabled: true
+      Name: GlobalCostmap
+      Topic:
+        Durability Policy: Transient Local
+        Value: /global_costmap/costmap
+      Update Topic:
+        Durability Policy: Transient Local
+        Value: /global_costmap/costmap_updates
+    - Class: rviz_default_plugins/LaserScan
+      Color: 255; 0; 0
+      Color Transformer: FlatColor
+      Enabled: true
+      Name: LaserScan
+      Size (m): 0.05
+      Style: Flat Squares
+      Topic:
+        Reliability Policy: Best Effort
+        Value: /scan
+    - Class: rviz_default_plugins/PoseWithCovariance
+      Enabled: true
+      Name: AmclPose
+      Topic:
+        Durability Policy: Volatile
+        Value: /amcl_pose
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: false
+      Name: Markers
+    - Class: rviz_default_plugins/Path
+      Color: 0; 255; 0
+      Enabled: true
+      Name: GlobalPath
+      Topic:
+        Value: /plan
+    - Class: rviz_default_plugins/PoseArray
+      Enabled: true
+      Name: ParticleCloud
+      Shape: Arrow (Flat)
+      Topic:
+        Reliability Policy: Best Effort
+        Value: /particle_cloud
+  Fixed Frame: map
+  Global Options:
+    Background Color: 48; 48; 48
+    Frame Rate: 30
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/SetInitialPose
+      Covariance x: 0.25
+      Covariance y: 0.25
+      Covariance yaw: 0.06853891909122467
+      Topic:
+        Value: /initialpose
+    - Class: rviz_default_plugins/SetGoal
+      Topic:
+        Value: /goal_pose
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 10
+      Name: Current View
+      Pitch: 1.0
+      Yaw: 3.14
+Window Geometry:
+  Height: 900
+  Width: 1400

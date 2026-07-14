@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Gazeboシミュレーション用ハンド: 実機trx_sハンドに「お盆の持ち手穴(9x2cm)に
+     差し込むくさび形フック指」を追加する。実機URDFには影響しない。
+     形状(ユーザースケッチ準拠):
+       上面視: 手ブロックから内側に向かって細くなる三角(くさび) → 穴への自動ガイド
+       正面視: 手ブロック下端から内側へ伸びる薄い板
+     くさびはボックス3段(幅8→5→2.2cm)の階段で近似。 -->
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename="$(arg parts_dir)/trx_s/trx_s.xacro" />
+
+    <xacro:macro
+        name="trx_s_sim"
+        params="type:=right prefix:=1 base_link:=hand_link">
+
+        <!-- 実機ハンド(見た目・関節)はそのまま -->
+        <xacro:trx_s type="${type}" prefix="${prefix}" base_link="${base_link}" />
+
+        <xacro:if value="${type=='right'}">
+            <xacro:property name="reflect" value="1" />
+        </xacro:if>
+        <xacro:unless value="${type=='right'}">
+            <xacro:property name="reflect" value="-1" />
+        </xacro:unless>
+
+        <!-- 右腕はPickPose時に系統的に+3.5cm高くなるため取付で補正
+             (実機調整値の姿勢を変えずに左右の指先高さを揃える) -->
+        <!-- block2/3のオフセット: 右はGUIゴースト実測値(右腕の姿勢ズレ込み)、
+             左は当初設計のミラー値(左は穴に入ることを確認済み) -->
+        <xacro:if value="${type=='right'}">
+            <xacro:property name="hook_z_offset" value="0.0" />
+            <xacro:property name="b2" value="-0.0503 0.0132 -0.058" />
+            <xacro:property name="b2r" value="-0.9451 1.5263 -0.9471" />
+            <xacro:property name="b3" value="-0.0745 0.062 -0.0638" />
+            <xacro:property name="b3r" value="-1.666 0.0594 -0.0317" />
+            <xacro:property name="b3s" value="0.005 0.05 0.05" />
+        </xacro:if>
+        <xacro:unless value="${type=='right'}">
+            <xacro:property name="hook_z_offset" value="0.0" />
+            <xacro:property name="b2" value="-0.0499 -0.0322 -0.0754" />
+            <xacro:property name="b2r" value="0.1896 1.5457 0.1822" />
+            <xacro:property name="b3" value="-0.0725 -0.0649 -0.0762" />
+            <xacro:property name="b3r" value="1.6247 -0.0041 0.0167" />
+            <xacro:property name="b3s" value="0.005 0.06 0.06" />
+        </xacro:unless>
+
+        <joint name="${prefix}_hook_joint" type="fixed">
+            <parent link="${base_link}" />
+            <child link="${prefix}_hook_link" />
+            <origin xyz="0 0 ${hook_z_offset}" rpy="0 0 0" />
+        </joint>
+
+        <link name="${prefix}_hook_link">
+            <inertial>
+                <mass value="0.05" />
+                <inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002" />
+            </inertial>
+
+            <!-- ユーザーがGazebo GUIで設計したハンド形状(右手基準で計測、左手はミラー)
+                 reflect=1:右手そのまま / reflect=-1:左手(y反転・roll/yaw反転) -->
+            <visual>
+                <origin xyz="0.0 ${0.0 * reflect} -0.1012" rpy="${-0.0 * reflect} 0.0 ${0.0001 * reflect}" />
+                <geometry><box size="0.06 0.05 0.13" /></geometry>
+            </visual>
+            <collision>
+                <origin xyz="0.0 ${0.0 * reflect} -0.1012" rpy="${-0.0 * reflect} 0.0 ${0.0001 * reflect}" />
+                <geometry><box size="0.06 0.05 0.13" /></geometry>
+            </collision>
+            <visual>
+                <origin xyz="${b2}" rpy="${b2r}" />
+                <geometry><box size="0.06 0.05 0.065" /></geometry>
+            </visual>
+            <collision>
+                <origin xyz="${b2}" rpy="${b2r}" />
+                <geometry><box size="0.06 0.05 0.065" /></geometry>
+            </collision>
+            <visual>
+                <origin xyz="${b3}" rpy="${b3r}" />
+                <geometry><box size="${b3s}" /></geometry>
+            </visual>
+            <collision>
+                <origin xyz="${b3}" rpy="${b3r}" />
+                <geometry><box size="${b3s}" /></geometry>
+            </collision>
+        </link>
+
+        <!-- フック先端の基準フレーム(位置合わせ計測用): 先端段の中心 -->
+        <joint name="${prefix}_hook_tip_joint" type="fixed">
+            <parent link="${prefix}_hook_link" />
+            <child link="${prefix}_hook_tip_link" />
+            <origin xyz="0 ${0.155 * reflect} -0.134" rpy="0 0 0" />
+        </joint>
+        <link name="${prefix}_hook_tip_link" />
+
+    </xacro:macro>
+</root>

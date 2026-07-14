@@ -44,8 +44,14 @@ install(DIRECTORY
   model
   moveit
   rviz
+  world
   stroke_converter/csv
   DESTINATION share/${PROJECT_NAME}/
+)
+
+install(PROGRAMS
+  src/cmd_vel_stamper.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 install(

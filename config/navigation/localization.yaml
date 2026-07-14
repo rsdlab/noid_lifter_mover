@@ -27,9 +27,17 @@ amcl:
     resample_interval: 1 # ← 1
     robot_model_type: "nav2_amcl::OmniMotionModel" # ← "nav2_amcl::DifferentialMotionModel"
     save_pose_rate: 1.0 # ← 0.5
+    # set_initial_pose はシミュレーション起動時(bringup_gazebo)に True へ書き換えられる
+    # (costmap activate前に map->odom TF を出すため)。初期姿勢はスポーン位置に合わせる。
+    set_initial_pose: false
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
     sigma_hit: 0.2
     tf_broadcast: true
-    transform_tolerance: 0.1 # ← 1.0
+    transform_tolerance: 1.0 # ← 0.1 (シミュレーションのTF遅延でcontroller_serverが失敗するため引き上げ)
     update_min_a: 0.05  # ← 0.2
     update_min_d: 0.05 # ← 0.25
     z_hit: 0.8      # ← 0.5

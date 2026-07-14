@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="position_joint" params="joint_name initial:=0.0">
+    <joint name="${joint_name}">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">${initial}</param>
+      </state_interface>
+      <state_interface name="velocity" />
+    </joint>
+  </xacro:macro>
+
+  <!-- mimic joints: <mimic> is parsed from the URDF; state interfaces only -->
+  <xacro:macro name="mimic_joint" params="joint_name">
+    <joint name="${joint_name}">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="velocity_joint" params="joint_name">
+    <joint name="${joint_name}">
+      <command_interface name="velocity" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="noid_lifter_mover_sim_ros2_control" params="name">
+
+    <ros2_control name="${name}" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+
+      <!-- mover wheels -->
+      <xacro:velocity_joint joint_name="wheel_front_left" />
+      <xacro:velocity_joint joint_name="wheel_front_right" />
+      <xacro:velocity_joint joint_name="wheel_rear_left" />
+      <xacro:velocity_joint joint_name="wheel_rear_right" />
+
+      <!-- lifter -->
+      <xacro:position_joint joint_name="ankle_joint" />
+      <xacro:position_joint joint_name="knee_joint" />
+      <xacro:mimic_joint joint_name="ankle_joint_dummy" />
+      <xacro:mimic_joint joint_name="ankle_joint_mimic" />
+      <xacro:mimic_joint joint_name="knee_joint_dummy" />
+      <xacro:mimic_joint joint_name="knee_joint_mimic" />
+
+      <!-- waist -->
+      <xacro:position_joint joint_name="waist_y_joint" />
+      <xacro:position_joint joint_name="waist_p_joint" />
+      <xacro:position_joint joint_name="waist_r_joint" />
+
+      <!-- head -->
+      <xacro:position_joint joint_name="neck_y_joint" />
+      <xacro:position_joint joint_name="neck_p_joint" />
+      <xacro:position_joint joint_name="neck_r_joint" />
+
+      <!-- right arm -->
+      <xacro:position_joint joint_name="r_shoulder_p_joint" />
+      <xacro:position_joint joint_name="r_shoulder_r_joint" />
+      <xacro:position_joint joint_name="r_shoulder_y_joint" />
+      <!-- 初期姿勢: CollaborationManipulationModuleのinitial_pose(-170deg)に合わせる -->
+      <xacro:position_joint joint_name="r_elbow_joint" initial="-2.96706" />
+      <xacro:position_joint joint_name="r_wrist_y_joint" />
+      <xacro:position_joint joint_name="r_wrist_p_joint" />
+      <xacro:position_joint joint_name="r_wrist_r_joint" />
+      <xacro:mimic_joint joint_name="r_elbow_joint_mimic" />
+      <xacro:mimic_joint joint_name="r_elbow_middle_joint" />
+      <xacro:mimic_joint joint_name="r_elbow_middle_joint_mimic" />
+
+      <!-- left arm -->
+      <xacro:position_joint joint_name="l_shoulder_p_joint" />
+      <xacro:position_joint joint_name="l_shoulder_r_joint" />
+      <xacro:position_joint joint_name="l_shoulder_y_joint" />
+      <!-- 初期姿勢: CollaborationManipulationModuleのinitial_pose(-170deg)に合わせる -->
+      <xacro:position_joint joint_name="l_elbow_joint" initial="-2.96706" />
+      <xacro:position_joint joint_name="l_wrist_y_joint" />
+      <xacro:position_joint joint_name="l_wrist_p_joint" />
+      <xacro:position_joint joint_name="l_wrist_r_joint" />
+      <xacro:mimic_joint joint_name="l_elbow_joint_mimic" />
+      <xacro:mimic_joint joint_name="l_elbow_middle_joint" />
+      <xacro:mimic_joint joint_name="l_elbow_middle_joint_mimic" />
+
+      <!-- hands -->
+      <xacro:position_joint joint_name="r_thumb_joint" />
+      <xacro:position_joint joint_name="l_thumb_joint" />
+      <xacro:mimic_joint joint_name="r_indexbase_joint" />
+      <xacro:mimic_joint joint_name="l_indexbase_joint" />
+
+    </ros2_control>
+
+  </xacro:macro>
+
+</robot>

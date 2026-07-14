@@ -46,7 +46,6 @@ private:
         "--ros-args",
         "--params-file", cm_param_path_,
         "--remap", "~/robot_description:=/robot_description",
-        "--remap", "/mechanum_controller/cmd_vel_nav:=/cmd_vel_nav"
       }, "controller_manager");
 
       launch_process({

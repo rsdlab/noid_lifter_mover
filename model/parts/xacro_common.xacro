@@ -5,8 +5,14 @@
     <xacro:arg name="mesh_visual" default="mesh" />
     <xacro:arg name="mesh_collision" default="mesh" />
 
-    <xacro:macro name="armlink" params="link_name model_type mesh_name base_origin_xyz base_origin_rpy">
+    <!-- mass/inertiaはGazeboシミュレーション用(実機制御では未使用)。
+         重くしすぎると関節のeffort limitが飽和して腕が垂れる -->
+    <xacro:macro name="armlink" params="link_name model_type mesh_name base_origin_xyz base_origin_rpy mass:=0.2 ixx:=0.003 iyy:=0.003 izz:=0.003">
         <link name="${link_name}">
+            <inertial>
+                <mass value="${mass}" />
+                <inertia ixx="${ixx}" ixy="0" ixz="0" iyy="${iyy}" iyz="0" izz="${izz}" />
+            </inertial>
             <visual>
                 <origin xyz="${base_origin_xyz}" rpy="${base_origin_rpy}" />
                 <geometry>

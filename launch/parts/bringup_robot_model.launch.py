@@ -135,7 +135,7 @@ def launch_setup(context, *args, **kwargs):
         {
             "name": "mechanum_controller",
             "param_file": os.path.join(robot_pkg, "config", "controllers", "controller_settings_mechanum.yaml"),
-            "remappings": [("~/cmd_vel", "/cmd_vel_nav")]
+            "remappings": []
         },
         {
             "name": "diagnostic_controller",

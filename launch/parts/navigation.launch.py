@@ -50,16 +50,9 @@ def generate_launch_description():
         'waypoint_follower',
     ]
 
-    # Map fully qualified names to relative ones so the node's namespace can be prepended.
-    # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
-    # https://github.com/ros/geometry2/issues/32
-    # https://github.com/ros/robot_state_publisher/pull/30
-    # TODO(orduno) Substitute with `PushNodeRemapping`
-    #              https://github.com/ros2/launch_ros/issues/56
     remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
 
-    # Create our own temporary YAML files that include substitutions
-    param_substitutions = {'autostart': autostart}
+    param_substitutions = {'autostart': autostart, 'use_sim_time': use_sim_time}
 
     configured_params = ParameterFile(
         RewrittenYaml(
@@ -97,6 +90,12 @@ def generate_launch_description():
         description='Automatically startup the nav2 stack',
     )
 
+    declare_bond_timeout_cmd = DeclareLaunchArgument(
+        'bond_timeout',
+        default_value='4.0',
+        description='Lifecycle manager bond heartbeat timeout in seconds (0.0 disables; recommended for simulation)',
+    )
+
     declare_use_composition_cmd = DeclareLaunchArgument(
         'use_composition',
         default_value='False',
@@ -118,21 +117,32 @@ def generate_launch_description():
     declare_log_level_cmd = DeclareLaunchArgument(
         'log_level', default_value='info', description='log level'
     )
-    
+
     declare_slam_mode_cmd = DeclareLaunchArgument(
         'slam_mode',
         default_value='False',
         description='Use slam_toolbox',
     )
-    
+
+    publish_static_map_odom_tf = LaunchConfiguration('publish_static_map_odom_tf')
+    declare_publish_static_map_odom_tf_cmd = DeclareLaunchArgument(
+        'publish_static_map_odom_tf',
+        default_value='True',
+        description='Publish a static map->odom TF. Set False when AMCL broadcasts map->odom (e.g. Gazebo simulation)',
+    )
+
     static_tf_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='static_map_to_odom_tf',
         arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'odom'],
         output='screen',
-        condition=UnlessCondition(slam_mode),
+        condition=IfCondition(
+            PythonExpression(['not ', slam_mode, ' and ', publish_static_map_odom_tf])
+        ),
     )
+
+    nav2_cmd_vel_remapping = ('cmd_vel', '/mechanum_controller/cmd_vel_nav')
 
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
@@ -146,7 +156,7 @@ def generate_launch_description():
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                remappings=remappings + [nav2_cmd_vel_remapping],  # ★ 修正
             ),
             Node(
                 package='nav2_planner',
@@ -168,7 +178,7 @@ def generate_launch_description():
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                remappings=remappings + [nav2_cmd_vel_remapping],  # ★ 修正
             ),
             Node(
                 package='nav2_bt_navigator',
@@ -198,12 +208,11 @@ def generate_launch_description():
                 name='lifecycle_manager_navigation',
                 output='screen',
                 arguments=['--ros-args', '--log-level', log_level],
-                parameters=[{'autostart': autostart}, {'node_names': lifecycle_nodes}],
+                parameters=[{'autostart': autostart}, {'node_names': lifecycle_nodes}, {'bond_timeout': LaunchConfiguration('bond_timeout')}],
             ),
         ],
     )
 
-    # コンテナの宣言
     container = ComposableNodeContainer(
         condition=IfCondition(use_composition),
         name=container_name,
@@ -211,8 +220,8 @@ def generate_launch_description():
         package='rclcpp_components',
         executable='component_container',
         output='screen',
-        parameters=[configured_params,{'use_sim_time': use_sim_time}],
-    )    
+        parameters=[configured_params, {'use_sim_time': use_sim_time}],
+    )
 
     load_composable_nodes = GroupAction(
         condition=IfCondition(use_composition),
@@ -226,7 +235,7 @@ def generate_launch_description():
                         plugin='nav2_controller::ControllerServer',
                         name='controller_server',
                         parameters=[configured_params],
-                        remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                        remappings=remappings + [nav2_cmd_vel_remapping],  # ★ 修正
                     ),
                     ComposableNode(
                         package='nav2_planner',
@@ -240,7 +249,7 @@ def generate_launch_description():
                         plugin='behavior_server::BehaviorServer',
                         name='behavior_server',
                         parameters=[configured_params],
-                        remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+                        remappings=remappings + [nav2_cmd_vel_remapping],  # ★ 修正
                     ),
                     ComposableNode(
                         package='nav2_bt_navigator',
@@ -261,7 +270,7 @@ def generate_launch_description():
                         plugin='nav2_lifecycle_manager::LifecycleManager',
                         name='lifecycle_manager_navigation',
                         parameters=[
-                            {'autostart': autostart, 'node_names': lifecycle_nodes}
+                            {'autostart': autostart, 'node_names': lifecycle_nodes, 'bond_timeout': LaunchConfiguration('bond_timeout')}
                         ],
                     ),
                 ],
@@ -269,25 +278,21 @@ def generate_launch_description():
         ],
     )
 
-    # Create the launch description and populate
     ld = LaunchDescription()
 
-    # Set environment variables
     ld.add_action(static_tf_node)
     ld.add_action(stdout_linebuf_envvar)
-
-    # Declare the launch options
     ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_autostart_cmd)
+    ld.add_action(declare_bond_timeout_cmd)
     ld.add_action(declare_use_composition_cmd)
     ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
     ld.add_action(declare_slam_mode_cmd)
     ld.add_action(container)
-    # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
 
