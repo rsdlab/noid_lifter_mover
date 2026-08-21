@@ -1,6 +1,6 @@
 bt_navigator:
    ros__parameters:
-      use_sim_time: false
+      use_sim_time: true
       global_frame: map
       robot_base_frame: base_link
       odom_topic: /mechanum_controller/odometry
@@ -21,7 +21,7 @@ bt_navigator:
 
 controller_server:
    ros__parameters:
-      use_sim_time: false
+      use_sim_time: true
       controller_frequency: 20.0
       odom_topic: /mechanum_controller/odometry
       costmap_update_timeout: 0.30
@@ -56,7 +56,7 @@ controller_server:
         vy_std:  0.05                   # 横方向サンプルを増やす
         wz_std:  0.15                   # 旋回速度のサンプル幅を確保
         vx_max:  0.2
-        vx_min:  -0.1
+        vx_min:  0.0                    # 後退禁止(LiDAR後方90度が死角のため)
         vy_max:  0.05                    # 横移動速度を確保
         wz_max:  0.6
         iteration_count: 3
@@ -94,15 +94,15 @@ controller_server:
         PathAngleCritic:
           enabled: true
           cost_power: 1
-          cost_weight: 0.5            # 向き変更を強制しない
-          offset_from_furthest: 3      
+          cost_weight: 2.0            # 経路方向への向き合わせを効かせる
+          offset_from_furthest: 3
           threshold_to_consider: 0.5
           max_angle_to_furthest: 1.57  # 90度超の場合のみペナルティ
-          mode: 2                      # Omniモード
+          mode: 0                      # FORWARD_PREFERENCE (後方はLiDAR死角のため後退させない)
         PreferForwardCritic:
           enabled: true
           cost_power: 1
-          cost_weight: 5.0             # 前進・横移動を両立
+          cost_weight: 20.0            # PathFollowCritic(50.0)に対抗できる水準
           threshold_to_consider: 0.5
         ObstaclesCritic:
           enabled: true
@@ -122,7 +122,7 @@ local_costmap:
          publish_frequency: 10.0
          global_frame: odom
          robot_base_frame: base_link
-         use_sim_time: false
+         use_sim_time: true
          rolling_window: true
          width: 3
          height: 3
@@ -139,7 +139,7 @@ local_costmap:
             combination_method: 1
             scan:
                topic: /scan
-               sensor_frame: ""
+               sensor_frame: "wheels_base_laser_link"
                observation_persistence: 0.0
                expected_update_rate: 0.0
                data_type: LaserScan
@@ -171,7 +171,7 @@ global_costmap:
          publish_frequency: 1.0
          global_frame: map
          robot_base_frame: base_link
-         use_sim_time: false
+         use_sim_time: true
          footprint: '[[-0.34, -0.2], [-0.34, 0.2], [0.34, 0.2], [0.34, -0.2]]'
          resolution: 0.01
          track_unknown_space: false
@@ -205,7 +205,7 @@ global_costmap:
 planner_server:
    ros__parameters:
       expected_planner_frequency: 0.5
-      use_sim_time: false
+      use_sim_time: true
       planner_plugins: ["GridBased"]
       GridBased:
          plugin: nav2_navfn_planner::NavfnPlanner
@@ -215,7 +215,7 @@ planner_server:
 
 behavior_server:
   ros__parameters:
-    use_sim_time: false
+    use_sim_time: true
     local_costmap_topic: local_costmap/costmap_raw
     global_costmap_topic: global_costmap/costmap_raw
     local_footprint_topic: local_costmap/published_footprint
@@ -241,7 +241,7 @@ behavior_server:
 
 waypoint_follower:
   ros__parameters:
-    use_sim_time: false
+    use_sim_time: true
     loop_rate: 20
     stop_on_failure: false
     action_server_result_timeout: 900.0
