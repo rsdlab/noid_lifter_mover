@@ -70,6 +70,16 @@ def setup(context, *args, **kwargs):
     with open(sim_urdf_path, 'w') as f:
         f.write(robot_description)
 
+    # world 内のテクスチャは model://world/materials/textures/*.png で参照している。
+    # gz は model:// を GZ_SIM_RESOURCE_PATH 配下から探すため、pkg_share を
+    # 通しておく必要がある(model://world/... の "world" が pkg_share/world に対応)。
+    # これが無いとテクスチャが解決できず、貼り面が真っ白になる。
+    # しかもエラーログは一切出ないので気付きにくい。
+    # 相対パス("materials/textures/...")だと gz の探索対象にならず、
+    # 起動時のカレントディレクトリが world/ の時だけ偶然読める状態になる。
+    os.environ['GZ_SIM_RESOURCE_PATH'] = os.pathsep.join(
+        [p for p in (pkg_share, os.environ.get('GZ_SIM_RESOURCE_PATH')) if p])
+
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')
@@ -110,6 +120,10 @@ def setup(context, *args, **kwargs):
             '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             # VelocityControlプラグインへのベース速度指令(cmd_vel_stamperが配信)
             '/model/noid_lifter_mover/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
+            # 胸部カメラ(ArUco検出用)。gz 側は sensor の <topic> と
+            # それに対応する camera_info トピックを自動で出す
+            '/chest_camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/chest_camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
         ],
     )
 

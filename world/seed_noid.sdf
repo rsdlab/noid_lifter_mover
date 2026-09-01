@@ -354,6 +354,52 @@
           <geometry><box><size>0.09 0.01 0.015</size></box></geometry>
           <material><ambient>0.45 0.10 0.10 1</ambient><diffuse>0.45 0.10 0.10 1</diffuse></material>
         </visual>
+        <!-- ArUco マーカー (DICT_ARUCO_ORIGINAL, id=1 と id=4)。
+             実機に貼付しているものと同じ辞書。seed_noid_marker_detection.launch.py の
+             aruco_dictionary_id 既定値 DICT_ARUCO_ORIGINAL と一致させること。
+             テクスチャ画像は 540x540px で、内訳は
+               黒枠の外形 420px + 周囲に白のクワイエットゾーン 60px(1モジュール)。
+             検出器が測る「マーカー一辺」は黒枠の外形なので、
+             板の一辺 0.0643m に対し marker_size = 0.0643 * 420/540 = 0.05m となる。
+             launch の marker_size 既定値 0.05 と一致。ここを変えたら launch も合わせること。
+             板厚 1mm、底板上面(z=0.005)から 0.5mm 浮かせて Z ファイティングを避ける。
+             お盆の長辺(y)方向の両端寄りに、実機の貼付位置に合わせて配置。
+             2枚は別IDなので、検出結果の ID だけで左右を判別できる。
+               id=1 : 奥(+y)
+               id=4 : ロボット側から見て手前(-y)
+             回転は与えていない(辞書の定義そのままの向き)。 -->
+        <visual name="aruco_1_vis">
+          <pose>0 0.13 0.0055 0 0 0</pose>
+          <geometry><box><size>0.0643 0.0643 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0 0 0 1</specular>
+            <pbr>
+              <metal>
+                <albedo_map>model://world/materials/textures/aruco_1.png</albedo_map>
+                <metalness>0.0</metalness>
+                <roughness>1.0</roughness>
+              </metal>
+            </pbr>
+          </material>
+        </visual>
+        <visual name="aruco_4_vis">
+          <pose>0 -0.13 0.0055 0 0 0</pose>
+          <geometry><box><size>0.0643 0.0643 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0 0 0 1</specular>
+            <pbr>
+              <metal>
+                <albedo_map>model://world/materials/textures/aruco_4.png</albedo_map>
+                <metalness>0.0</metalness>
+                <roughness>1.0</roughness>
+              </metal>
+            </pbr>
+          </material>
+        </visual>
       </link>
     </model>
 

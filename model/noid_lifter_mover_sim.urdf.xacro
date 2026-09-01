@@ -94,6 +94,57 @@
     <xacro:trx_s_sim prefix="l" type="left" base_link="${lhand_base_link}"/>
 
 
+    <!-- 胸部カメラ(実機 RealSense D415 相当)のシミュレーション。
+         実機では realsense2_camera ドライバが画像を配信するが、シムには
+         カメラが無く ArUco 検出が動かないため、ここでセンサを定義する。
+         typeg_body.xacro は実機URDFと共用のため、シム専用のこちらに置く。
+
+         chest_camera_link は ROS の光学系規約(Z前方/X右/Y下)ではなく
+         リンク系(X前方/Y左/Z上)なので、そのままセンサを付けると画像が
+         90度回転して ArUco の姿勢推定がおかしくなる。
+         規約変換用に chest_camera_optical_frame を挟む。 -->
+    <link name="chest_camera_optical_frame" />
+
+    <!-- ROS の画像は光学系規約(Z前方/X右/Y下)の frame_id を期待するため、
+         その変換用フレームを用意する。gz_frame_id にこれを指定することで
+         配信される画像の frame_id が光学系になり、ArUco の姿勢推定結果を
+         そのまま TF で扱える。
+         注意: このフレームに <sensor> を付けてはいけない。
+         SDF のカメラは自フレームの +X 方向を向く仕様で、光学系の回転を
+         重ねると二重回転になり、あらぬ方向を向く(実際に床と壁しか映らなかった)。
+         センサ本体は回転を掛けない chest_camera_link 側に付ける。 -->
+    <joint name="chest_camera_link_to_optical_frame" type="fixed">
+        <parent link="chest_camera_link" />
+        <child link="chest_camera_optical_frame" />
+        <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    </joint>
+
+    <gazebo reference="chest_camera_link">
+        <sensor name="chest_camera" type="camera">
+            <topic>chest_camera/image_raw</topic>
+            <gz_frame_id>chest_camera_optical_frame</gz_frame_id>
+            <update_rate>30</update_rate>
+            <always_on>true</always_on>
+            <visualize>false</visualize>
+            <camera>
+                <!-- D415 カラーの水平画角 69.4deg = 1.211 rad -->
+                <horizontal_fov>1.211</horizontal_fov>
+                <image>
+                    <width>1280</width>
+                    <height>720</height>
+                    <format>R8G8B8</format>
+                </image>
+                <!-- カメラ原点が胸部メッシュのすぐ内側にあるため、near が
+                     小さすぎると自機の筐体が写り込む。0.15m で筐体を除去しつつ、
+                     お盆(約0.46m先)は欠けない。 -->
+                <clip>
+                    <near>0.15</near>
+                    <far>10.0</far>
+                </clip>
+            </camera>
+        </sensor>
+    </gazebo>
+
     <xacro:include filename="$(find noid_lifter_mover)/model/noid_lifter_mover_sim.ros2_control.xacro" />
     <xacro:noid_lifter_mover_sim_ros2_control name="noid_lifter_mover_sim" />
 
