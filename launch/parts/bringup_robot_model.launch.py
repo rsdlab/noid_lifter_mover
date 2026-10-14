@@ -5,7 +5,7 @@ import time
 from distutils.util import strtobool
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.actions import IncludeLaunchDescription, OpaqueFunction, TimerAction, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution, Command, FindExecutable, LaunchConfiguration
@@ -262,6 +262,17 @@ def generate_launch_description():
     ))
 
     bringup_stub(driver_settings, ld, condition=IfCondition(simulation))
+
+    # urg_node2はframe_id 'laser'で/scanを出すが、URDFのLiDARリンクはwheels_base_laser_linkのため、
+    # TFが繋がらずNav2(amcl/costmap)が全スキャンを捨てる。同一位置としてlaserフレームを繋ぐ。
+    ld.add_action(Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="laser_frame_tf",
+        output="screen",
+        arguments=["--frame-id", "wheels_base_laser_link", "--child-frame-id", "laser"],
+        condition=UnlessCondition(simulation),
+    ))
 
     ld.add_action(OpaqueFunction(function=launch_setup, kwargs={"pkg_name": pkg_name}))
 

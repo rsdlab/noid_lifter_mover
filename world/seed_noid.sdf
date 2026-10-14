@@ -465,7 +465,7 @@
             <specular>0 0 0 1</specular>
             <pbr>
               <metal>
-                <albedo_map>file:///home/rsdlab/seed_ROS2_ws/src/seed_robot_ros2_pkg/robots/noid_lifter_mover/world/rsdlab_map.png</albedo_map>
+                <albedo_map>model://world/rsdlab_map.png</albedo_map>
                 <metalness>0.0</metalness>
                 <roughness>1.0</roughness>
               </metal>
